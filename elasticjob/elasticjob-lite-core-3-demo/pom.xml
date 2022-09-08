@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>net.coderlin.demo</groupId>
     <artifactId>elasticjob-lite-core-3-demo</artifactId>
 
     <dependencies>
