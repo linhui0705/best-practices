@@ -13,6 +13,7 @@
         <module>elasticjob</module>
         <module>redis</module>
         <module>rocketmq</module>
+        <module>caffeine</module>
     </modules>
 
     <properties>
