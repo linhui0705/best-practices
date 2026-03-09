@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 天气查询工具类 - 演示Tools功能
@@ -37,8 +37,7 @@ public class WeatherTools {
     /**
      * 模拟天气数据存储
      */
-    private static final Map<String, WeatherData> weatherDatabase = new HashMap<>();
-    private final Random random = new Random();
+    private static final Map<String, WeatherData> WEATHER_DATABASE = new HashMap<>();
 
     /**
      * 天气数据内部类
@@ -162,7 +161,7 @@ public class WeatherTools {
         // 基础温度根据城市hash生成（10-35度之间）
         double baseTemp = 10 + (cityHash % 25);
         // 添加随机波动
-        double temperature = baseTemp + random.nextDouble() * 4 - 2;
+        double temperature = baseTemp + ThreadLocalRandom.current().nextDouble() * 4 - 2;
         
         // 天气状况
         String[] conditions = {"晴", "多云", "阴", "小雨", "雷阵雨"};
@@ -172,7 +171,7 @@ public class WeatherTools {
         int humidity = 30 + (cityHash % 60);
         
         // 风速（0-20 km/h）
-        double windSpeed = random.nextDouble() * 20;
+        double windSpeed = ThreadLocalRandom.current().nextDouble() * 20;
         
         // 更新时间
         String updateTime = java.time.LocalDateTime.now()

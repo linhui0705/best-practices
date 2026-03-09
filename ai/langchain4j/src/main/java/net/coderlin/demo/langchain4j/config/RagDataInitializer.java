@@ -16,9 +16,9 @@ import java.util.List;
 
 /**
  * RAG数据初始化器
- * 
+ *
  * <p>应用启动时自动加载示例文档到向量存储，用于演示检索增强生成功能。</p>
- * 
+ *
  * <p><b>初始化流程：</b></p>
  * <ol>
  *   <li>创建示例文档（模拟知识库内容）</li>
@@ -26,14 +26,14 @@ import java.util.List;
  *   <li>使用EmbeddingModel将文本块转为向量</li>
  *   <li>存储到EmbeddingStore</li>
  * </ol>
- * 
+ *
  * <p><b>文档内容说明：</b></p>
  * <ul>
  *   <li>LangChain4j简介：框架概述和核心特性</li>
  *   <li>Spring Boot集成：与Spring Boot的整合方式</li>
  *   <li>AI Service：声明式服务接口说明</li>
  * </ul>
- * 
+ *
  * @author
  * @since 1.0.0
  */

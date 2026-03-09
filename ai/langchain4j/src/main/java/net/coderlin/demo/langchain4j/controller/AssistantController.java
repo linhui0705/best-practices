@@ -10,16 +10,16 @@ import reactor.core.publisher.Mono;
 
 /**
  * 基础AI助手Controller
- * 
+ *
  * <p>提供基础对话、诗歌创作、情感分析等API接口。</p>
- * 
+ *
  * <p><b>API端点说明：</b></p>
  * <ul>
  *   <li>POST /api/assistant/chat - 基础对话</li>
  *   <li>POST /api/assistant/poem - 诗歌创作</li>
  *   <li>POST /api/assistant/sentiment - 情感分析</li>
  * </ul>
- * 
+ *
  * @author
  * @since 1.0.0
  */
@@ -36,19 +36,19 @@ public class AssistantController {
 
     /**
      * 基础对话接口
-     * 
+     *
      * <p>最简单的AI对话，无记忆功能，每次独立。</p>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/assistant/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "message": "你好，请介绍一下自己"
      * }
      * </pre>
-     * 
+     *
      * <p><b>响应示例：</b></p>
      * <pre>
      * {
@@ -57,7 +57,7 @@ public class AssistantController {
      *   "timestamp": "2024-01-15T10:30:00"
      * }
      * </pre>
-     * 
+     *
      * @param request 对话请求
      * @return AI回复
      */
@@ -76,20 +76,20 @@ public class AssistantController {
 
     /**
      * 诗歌创作接口
-     * 
+     *
      * <p>使用模板方法，根据主题和风格创作诗歌。</p>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/assistant/poem
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "topic": "春天",
      *   "style": "七言绝句"
      * }
      * </pre>
-     * 
+     *
      * @param request 诗歌创作请求
      * @return 创作的诗歌
      */
@@ -108,19 +108,19 @@ public class AssistantController {
 
     /**
      * 情感分析接口
-     * 
+     *
      * <p>分析文本的情感倾向，返回结构化结果。</p>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/assistant/sentiment
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "text": "今天天气真好，心情非常愉快！"
      * }
      * </pre>
-     * 
+     *
      * <p><b>响应示例：</b></p>
      * <pre>
      * {
@@ -129,7 +129,7 @@ public class AssistantController {
      *   "timestamp": "2024-01-15T10:30:00"
      * }
      * </pre>
-     * 
+     *
      * @param request 情感分析请求
      * @return 情感分析结果（JSON格式）
      */
@@ -153,14 +153,14 @@ public class AssistantController {
 
     /**
      * GET方式基础对话（便捷接口）
-     * 
+     *
      * <p>用于快速测试，直接通过URL参数发送消息。</p>
-     * 
+     *
      * <p><b>示例：</b></p>
      * <pre>
      * GET /api/assistant/chat?message=你好
      * </pre>
-     * 
+     *
      * @param message 用户消息
      * @return AI回复
      */

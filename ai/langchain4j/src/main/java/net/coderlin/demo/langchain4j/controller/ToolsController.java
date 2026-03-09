@@ -12,30 +12,30 @@ import reactor.core.publisher.Mono;
 
 /**
  * 工具调用Controller
- * 
+ *
  * <p>提供支持工具调用的AI对话API接口。</p>
- * 
+ *
  * <p><b>可用工具：</b></p>
  * <ul>
  *   <li><b>CalculatorTools</b>：数学计算工具
-     *     <ul>
-     *       <li>add - 加法</li>
-     *       <li>subtract - 减法</li>
-     *       <li>multiply - 乘法</li>
-     *       <li>divide - 除法</li>
-     *       <li>sqrt - 平方根</li>
-     *       <li>power - 幂运算</li>
-     *     </ul>
+ *     <ul>
+ *       <li>add - 加法</li>
+ *       <li>subtract - 减法</li>
+ *       <li>multiply - 乘法</li>
+ *       <li>divide - 除法</li>
+ *       <li>sqrt - 平方根</li>
+ *       <li>power - 幂运算</li>
+ *     </ul>
  *   </li>
  *   <li><b>WeatherTools</b>：天气查询工具
-     *     <ul>
-     *       <li>getWeather - 查询天气</li>
-     *       <li>getTemperature - 获取温度</li>
-     *       <li>compareTemperature - 比较城市温度</li>
-     *     </ul>
+ *     <ul>
+ *       <li>getWeather - 查询天气</li>
+ *       <li>getTemperature - 获取温度</li>
+ *       <li>compareTemperature - 比较城市温度</li>
+ *     </ul>
  *   </li>
  * </ul>
- * 
+ *
  * <p><b>API端点：</b></p>
  * <ul>
  *   <li>POST /api/tools/chat - 基础工具对话</li>
@@ -43,7 +43,7 @@ import reactor.core.publisher.Mono;
  *   <li>POST /api/tools/weather - 天气助手模式</li>
  *   <li>POST /api/tools/memory - 带记忆的工具对话</li>
  * </ul>
- * 
+ *
  * @author
  * @since 1.0.0
  */
@@ -60,44 +60,44 @@ public class ToolsController {
 
     /**
      * 基础工具对话接口
-     * 
+     *
      * <p>AI自动判断是否需要调用工具。</p>
-     * 
+     *
      * <p><b>使用示例：</b></p>
-     * 
+     *
      * <p>1. 数学计算：</p>
      * <pre>
      * POST /api/tools/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "message": "123乘以456等于多少？"
      * }
      * // AI调用multiply(123, 456)，返回计算结果
      * </pre>
-     * 
+     *
      * <p>2. 天气查询：</p>
      * <pre>
      * POST /api/tools/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "message": "北京今天天气怎么样？"
      * }
      * // AI调用getWeather("北京")，返回天气信息
      * </pre>
-     * 
+     *
      * <p>3. 普通对话（无需工具）：</p>
      * <pre>
      * POST /api/tools/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "message": "你好"
      * }
      * // AI直接回复，不调用工具
      * </pre>
-     * 
+     *
      * @param request 对话请求
      * @return AI回复
      */
@@ -116,19 +116,19 @@ public class ToolsController {
 
     /**
      * 数学专家模式
-     * 
+     *
      * <p>专注于数学计算，AI会详细展示计算过程。</p>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/tools/math
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "message": "计算 (123 + 456) * 789 / 2 的值"
      * }
      * </pre>
-     * 
+     *
      * <p><b>响应示例：</b></p>
      * <pre>
      * {
@@ -137,7 +137,7 @@ public class ToolsController {
      *   "timestamp": "2024-01-15T10:30:00"
      * }
      * </pre>
-     * 
+     *
      * @param request 数学问题请求
      * @return 详细解答
      */
@@ -156,20 +156,20 @@ public class ToolsController {
 
     /**
      * 天气助手模式
-     * 
+     *
      * <p>专注于天气查询和出行建议。</p>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/tools/weather
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "message": "北京和上海哪个城市更热？"
      * }
      * // AI调用compareTemperature("北京", "上海")，返回比较结果
      * </pre>
-     * 
+     *
      * @param request 天气查询请求
      * @return 天气信息和建议
      */
@@ -188,39 +188,39 @@ public class ToolsController {
 
     /**
      * 带记忆的工具对话
-     * 
+     *
      * <p>结合Memory和Tools，实现上下文感知的工具调用。</p>
-     * 
+     *
      * <p><b>使用场景：</b></p>
      * <ul>
      *   <li>多轮计算对话，记住中间结果</li>
      *   <li>旅行规划，记住查询过的城市</li>
      *   <li>数据分析，引用之前的数据</li>
      * </ul>
-     * 
+     *
      * <p><b>请求示例（第一轮）：</b></p>
      * <pre>
      * POST /api/tools/memory
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "calc_session_001",
      *   "message": "计算 100 除以 4"
      * }
      * </pre>
-     * 
+     *
      * <p><b>请求示例（第二轮，引用之前结果）：</b></p>
      * <pre>
      * POST /api/tools/memory
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "calc_session_001",
      *   "message": "把刚才的结果再乘以 5"
      * }
      * // AI记得"刚才的结果"是25，计算25 * 5 = 125
      * </pre>
-     * 
+     *
      * @param request 带记忆的对话请求
      * @return AI回复
      */
@@ -243,12 +243,12 @@ public class ToolsController {
 
     /**
      * GET方式工具对话（便捷测试接口）
-     * 
+     *
      * <p><b>示例：</b></p>
      * <pre>
      * GET /api/tools/chat?message=123乘以456等于多少
      * </pre>
-     * 
+     *
      * @param message 用户消息
      * @return AI回复
      */

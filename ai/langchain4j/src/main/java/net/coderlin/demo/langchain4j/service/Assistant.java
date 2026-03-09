@@ -110,7 +110,7 @@ public interface Assistant {
 
     /**
      * 情感分析结果类
-     * 
+     *
      * <p>用于接收AI返回的结构化数据。</p>
      */
     class SentimentResult {
@@ -121,24 +121,40 @@ public interface Assistant {
         /**
          * 置信度分数：0.0-1.0
          */
-        private double confidence;
+        private Double confidence;
         /**
          * 分析理由说明
          */
         private String reason;
 
-        // Getters and Setters
-        public String getSentiment() { return sentiment; }
-        public void setSentiment(String sentiment) { this.sentiment = sentiment; }
-        public double getConfidence() { return confidence; }
-        public void setConfidence(double confidence) { this.confidence = confidence; }
-        public String getReason() { return reason; }
-        public void setReason(String reason) { this.reason = reason; }
+        public String getSentiment() {
+            return sentiment;
+        }
+
+        public void setSentiment(String sentiment) {
+            this.sentiment = sentiment;
+        }
+
+        public Double getConfidence() {
+            return confidence;
+        }
+
+        public void setConfidence(Double confidence) {
+            this.confidence = confidence;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public void setReason(String reason) {
+            this.reason = reason;
+        }
 
         @Override
         public String toString() {
-            return String.format("SentimentResult{sentiment='%s', confidence=%.2f, reason='%s'}", 
-                sentiment, confidence, reason);
+            return String.format("SentimentResult{sentiment='%s', confidence=%.2f, reason='%s'}",
+                    sentiment, confidence, reason);
         }
     }
 }

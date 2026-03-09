@@ -11,22 +11,22 @@ import reactor.core.publisher.Mono;
 
 /**
  * 带记忆功能的对话Controller
- * 
+ *
  * <p>提供多轮对话API，支持上下文记忆。</p>
- * 
+ *
  * <p><b>核心概念：</b></p>
  * <ul>
  *   <li>sessionId：会话标识符，相同ID共享对话历史</li>
  *   <li>ChatMemory：自动管理多轮对话上下文</li>
  * </ul>
- * 
+ *
  * <p><b>API端点：</b></p>
  * <ul>
  *   <li>POST /api/memory/chat - 基础记忆对话</li>
  *   <li>POST /api/memory/tech - 技术咨询（专家模式）</li>
  *   <li>POST /api/memory/form - 表单数据收集</li>
  * </ul>
- * 
+ *
  * @author
  * @since 1.0.0
  */
@@ -43,38 +43,38 @@ public class MemoryController {
 
     /**
      * 带记忆的多轮对话接口
-     * 
+     *
      * <p>核心接口，演示ChatMemory的基本用法。</p>
-     * 
+     *
      * <p><b>使用流程：</b></p>
      * <ol>
      *   <li>第一轮：发送sessionId和第一条消息</li>
      *   <li>后续轮：使用相同sessionId，AI会记住之前的对话</li>
      * </ol>
-     * 
+     *
      * <p><b>请求示例（第一轮）：</b></p>
      * <pre>
      * POST /api/memory/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "user_001",
      *   "message": "我叫张三"
      * }
      * </pre>
-     * 
+     *
      * <p><b>请求示例（第二轮，同一sessionId）：</b></p>
      * <pre>
      * POST /api/memory/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "user_001",
      *   "message": "我叫什么名字？"
      * }
      * // AI回复：你叫张三。
      * </pre>
-     * 
+     *
      * @param request 带记忆的对话请求
      * @return AI回复
      */
@@ -97,27 +97,27 @@ public class MemoryController {
 
     /**
      * 技术咨询接口
-     * 
+     *
      * <p>AI扮演Java技术专家，提供技术咨询服务。</p>
-     * 
+     *
      * <p><b>特点：</b></p>
      * <ul>
      *   <li>记住用户的技术水平</li>
      *   <li>避免重复解释已讨论的内容</li>
      *   <li>提供连贯的技术指导</li>
      * </ul>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/memory/tech
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "tech_session_001",
      *   "message": "Spring Boot是什么？"
      * }
      * </pre>
-     * 
+     *
      * @param request 技术咨询请求
      * @return 技术解答
      */
@@ -140,27 +140,27 @@ public class MemoryController {
 
     /**
      * 表单数据收集接口
-     * 
+     *
      * <p>演示如何使用AI收集结构化表单数据。</p>
-     * 
+     *
      * <p><b>使用方式：</b></p>
      * <ol>
      *   <li>逐个字段提交数据</li>
      *   <li>AI确认并记录每个字段</li>
      *   <li>提示下一个需要填写的字段</li>
      * </ol>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/memory/form
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "form_001",
      *   "message": "name:张三"  // 格式：字段名:字段值
      * }
      * </pre>
-     * 
+     *
      * @param request 表单数据请求
      * @return 确认信息和下一步提示
      */
@@ -193,14 +193,14 @@ public class MemoryController {
 
     /**
      * GET方式记忆对话（便捷测试接口）
-     * 
+     *
      * <p>用于快速测试记忆功能。</p>
-     * 
+     *
      * <p><b>示例：</b></p>
      * <pre>
      * GET /api/memory/chat?sessionId=user_001&message=你好
      * </pre>
-     * 
+     *
      * @param sessionId 会话ID
      * @param message 用户消息
      * @return AI回复

@@ -11,9 +11,9 @@ import reactor.core.publisher.Mono;
 
 /**
  * RAG（检索增强生成）Controller
- * 
+ *
  * <p>提供基于知识库的问答API接口。</p>
- * 
+ *
  * <p><b>RAG工作流程：</b></p>
  * <ol>
  *   <li>用户提出问题</li>
@@ -21,14 +21,14 @@ import reactor.core.publisher.Mono;
  *   <li>将检索结果作为上下文传递给AI</li>
  *   <li>AI基于知识生成回答</li>
  * </ol>
- * 
+ *
  * <p><b>API端点：</b></p>
  * <ul>
  *   <li>POST /api/rag/query - 基础知识库查询</li>
  *   <li>POST /api/rag/citation - 带引用来源的查询</li>
  *   <li>POST /api/rag/chat - 带记忆的知识库对话</li>
  * </ul>
- * 
+ *
  * @author
  * @since 1.0.0
  */
@@ -45,9 +45,9 @@ public class RagController {
 
     /**
      * 基础知识库查询接口
-     * 
+     *
      * <p>从预加载的知识库中检索信息并回答。</p>
-     * 
+     *
      * <p><b>知识库内容：</b></p>
      * <ul>
      *   <li>LangChain4j框架介绍</li>
@@ -56,17 +56,17 @@ public class RagController {
      *   <li>ChatMemory功能介绍</li>
      *   <li>Tools工具调用说明</li>
      * </ul>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/rag/query
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "question": "什么是LangChain4j？"
      * }
      * </pre>
-     * 
+     *
      * <p><b>响应示例：</b></p>
      * <pre>
      * {
@@ -75,7 +75,7 @@ public class RagController {
      *   "timestamp": "2024-01-15T10:30:00"
      * }
      * </pre>
-     * 
+     *
      * @param request 查询请求
      * @return 基于知识库的回答
      */
@@ -94,26 +94,26 @@ public class RagController {
 
     /**
      * 带引用来源的知识库查询
-     * 
+     *
      * <p>AI会在回答中标注信息来源文档。</p>
-     * 
+     *
      * <p><b>适用场景：</b></p>
      * <ul>
      *   <li>需要验证回答准确性的场景</li>
      *   <li>学术、技术文档查询</li>
      *   <li>需要追溯原始出处的场景</li>
      * </ul>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/rag/citation
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "question": "LangChain4j有哪些核心特性？"
      * }
      * </pre>
-     * 
+     *
      * <p><b>响应示例：</b></p>
      * <pre>
      * {
@@ -123,7 +123,7 @@ public class RagController {
      *   "timestamp": "2024-01-15T10:30:00"
      * }
      * </pre>
-     * 
+     *
      * @param request 查询请求
      * @return 带引用来源的回答
      */
@@ -142,27 +142,27 @@ public class RagController {
 
     /**
      * 带记忆的知识库对话
-     * 
+     *
      * <p>结合RAG和Memory，实现多轮技术咨询。</p>
-     * 
+     *
      * <p><b>特点：</b></p>
      * <ul>
      *   <li>记住之前的技术问题</li>
      *   <li>基于知识库回答</li>
      *   <li>支持追问和深入探讨</li>
      * </ul>
-     * 
+     *
      * <p><b>请求示例：</b></p>
      * <pre>
      * POST /api/rag/chat
      * Content-Type: application/json
-     * 
+     *
      * {
      *   "sessionId": "rag_session_001",
      *   "question": "什么是AI Service？"
      * }
      * </pre>
-     * 
+     *
      * <p><b>追问示例（同一sessionId）：</b></p>
      * <pre>
      * {
@@ -171,7 +171,7 @@ public class RagController {
      * }
      * // AI会理解"它"指的是AI Service
      * </pre>
-     * 
+     *
      * @param request 查询请求（包含sessionId）
      * @return 上下文感知的回答
      */
@@ -199,12 +199,12 @@ public class RagController {
 
     /**
      * GET方式知识库查询（便捷测试接口）
-     * 
+     *
      * <p><b>示例：</b></p>
      * <pre>
      * GET /api/rag/query?question=什么是LangChain4j
      * </pre>
-     * 
+     *
      * @param question 问题
      * @return 回答
      */

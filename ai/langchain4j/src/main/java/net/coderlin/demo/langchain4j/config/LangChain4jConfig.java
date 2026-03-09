@@ -31,7 +31,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 
 /**
  * LangChain4j 核心配置类
- * 
+ *
  * <p>本配置类定义了LangChain4j所需的核心Bean，包括：</p>
  * <ul>
  *   <li>ChatMemory：对话记忆管理（请求级别作用域）</li>
@@ -39,14 +39,14 @@ import org.springframework.context.annotation.ScopedProxyMode;
  *   <li>EmbeddingModel：嵌入模型（用于生成向量）</li>
  *   <li>ContentRetriever：内容检索器（RAG核心组件）</li>
  * </ul>
- * 
+ *
  * <p><b>设计说明：</b></p>
  * <ul>
  *   <li>ChatMemory配置为请求作用域，每个用户会话独立维护对话历史</li>
  *   <li>EmbeddingStore使用内存存储，生产环境建议替换为向量数据库</li>
  *   <li>支持本地和远程两种Embedding模型</li>
  * </ul>
- * 
+ *
  * @author
  * @since 1.0.0
  */
@@ -55,10 +55,50 @@ import org.springframework.context.annotation.ScopedProxyMode;
 public class LangChain4jConfig {
 
     /**
+     * 默认记忆窗口大小
+     */
+    private static final int DEFAULT_MAX_MEMORY_MESSAGES = 10;
+
+    /**
+     * 默认OpenAI Base URL
+     */
+    private static final String DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
+
+    /**
+     * 默认OpenAI模型名称
+     */
+    private static final String DEFAULT_OPENAI_MODEL_NAME = "gpt-3.5-turbo";
+
+    /**
+     * 默认温度参数
+     */
+    private static final double DEFAULT_OPENAI_TEMPERATURE = 0.7;
+
+    /**
+     * 内容检索器最大返回结果数
+     */
+    private static final int CONTENT_RETRIEVER_MAX_RESULTS = 3;
+
+    /**
+     * 内容检索器最小相似度分数
+     */
+    private static final double CONTENT_RETRIEVER_MIN_SCORE = 0.7;
+
+    /**
+     * 文档分割器最大片段大小
+     */
+    private static final int DOCUMENT_SPLITTER_MAX_SIZE = 500;
+
+    /**
+     * 文档分割器最大重叠大小
+     */
+    private static final int DOCUMENT_SPLITTER_MAX_OVERLAP = 50;
+
+    /**
      * 记忆窗口大小，从配置文件读取
      * 控制保留多少轮对话历史
      */
-    @Value("${app.ai.max-memory-messages:10}")
+    @Value("${app.ai.max-memory-messages:" + DEFAULT_MAX_MEMORY_MESSAGES + "}")
     private int maxMemoryMessages;
 
     /**
@@ -70,20 +110,20 @@ public class LangChain4jConfig {
     /**
      * OpenAI 模型名称
      */
-    @Value("${langchain4j.open-ai.chat-model.model-name:gpt-3.5-turbo}")
+    @Value("${langchain4j.open-ai.chat-model.model-name:" + DEFAULT_OPENAI_MODEL_NAME + "}")
     private String openAiModelName;
 
     /**
      * OpenAI Base URL（可选，用于代理或兼容服务）
      */
-    @Value("${langchain4j.open-ai.chat-model.base-url:https://api.openai.com/v1}")
+    @Value("${langchain4j.open-ai.chat-model.base-url:" + DEFAULT_OPENAI_BASE_URL + "}")
     private String openAiBaseUrl;
 
     /**
      * OpenAI 温度参数
      */
-    @Value("${langchain4j.open-ai.chat-model.temperature:0.7}")
-    private double openAiTemperature;
+    @Value("${langchain4j.open-ai.chat-model.temperature:" + DEFAULT_OPENAI_TEMPERATURE + "}")
+    private Double openAiTemperature;
 
     /**
      * 配置ChatMemory Bean - 请求级别作用域
@@ -200,10 +240,10 @@ public class LangChain4jConfig {
                 .embeddingStore(embeddingStore)
                 // 嵌入模型
                 .embeddingModel(embeddingModel)
-                // 返回最相关的3个结果
-                .maxResults(3)
+                // 返回最相关的结果
+                .maxResults(CONTENT_RETRIEVER_MAX_RESULTS)
                 // 最小相似度分数（0-1之间）
-                .minScore(0.7)
+                .minScore(CONTENT_RETRIEVER_MIN_SCORE)
                 .build();
     }
 
@@ -226,7 +266,7 @@ public class LangChain4jConfig {
      */
     @Bean
     public DocumentSplitter documentSplitter() {
-        return DocumentSplitters.recursive(500, 50);
+        return DocumentSplitters.recursive(DOCUMENT_SPLITTER_MAX_SIZE, DOCUMENT_SPLITTER_MAX_OVERLAP);
     }
 
     // ==================== ChatLanguageModel 配置 ====================
