@@ -16,6 +16,7 @@
         <module>caffeine</module>
         <module>kafka</module>
         <module>powerjob</module>
+        <module>drools</module>
     </modules>
 
     <properties>
