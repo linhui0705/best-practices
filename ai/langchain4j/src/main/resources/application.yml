@@ -1,0 +1,79 @@
+# ============================================
+# LangChain4j Spring Boot 3 Demo 配置文件
+# ============================================
+
+spring:
+  application:
+    # 应用名称
+    name: langchain4j-demo
+  
+  # 可选：配置Banner
+  main:
+    banner-mode: console
+
+# ============================================
+# LangChain4j 核心配置
+# ============================================
+langchain4j:
+  
+  # ----------------------------------------
+  # OpenAI 模型配置
+  # ----------------------------------------
+  open-ai:
+    # Chat模型配置（用于对话生成）
+    chat-model:
+      # API密钥 - 请替换为您的OpenAI API Key 或 通义千问 API Key
+      # 可以通过环境变量 OPENAI_API_KEY 设置
+      api-key: ${OPENAI_API_KEY:openai-api-key}
+      
+      # 模型名称：gpt-4, gpt-3.5-turbo, qwen-turbo 等
+      model-name: qwen3.5-plus
+      
+      # 温度参数：0.0-2.0，控制随机性，越低越确定
+      temperature: 0.7
+      
+      # 最大生成token数
+      max-tokens: 2000
+      
+      # 超时设置（毫秒）
+      timeout: PT60S
+      
+      # 可选：自定义Base URL（用于代理或兼容服务）
+      # base-url: https://api.openai.com/v1
+      base-url: https://coding.dashscope.aliyuncs.com/v1
+    
+    # Embedding模型配置（用于向量嵌入）
+    embedding-model:
+      api-key: ${OPENAI_API_KEY:openai-api-key}
+      model-name: text-embedding-ada-002
+      timeout: PT60S
+  
+  # ----------------------------------------
+  # 本地Embedding模型配置（备选方案）
+  # 使用本地模型无需API Key，适合离线环境
+  # ----------------------------------------
+  # in-process-embedding-model:
+  #   # 使用all-MiniLM-L6-v2模型
+  #   model-name: all-minilm-l6-v2
+
+# ============================================
+# 日志配置
+# ============================================
+logging:
+  level:
+    # LangChain4j 调试日志
+    dev.langchain4j: DEBUG
+    # Spring Web日志
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ============================================
+# 自定义配置参数
+# ============================================
+app:
+  ai:
+    # 默认系统提示词
+    default-system-message: "你是一个 helpful AI 助手，请用中文回答问题。"
+    # 记忆窗口大小（保留多少轮对话）
+    max-memory-messages: 10
