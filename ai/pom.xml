@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>langchain4j</module>
+        <module>spring-ai</module>
     </modules>
 
     <properties>

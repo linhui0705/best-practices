@@ -1,0 +1,98 @@
+# ============================================
+# Spring AI Spring Boot 3 Demo 配置文件
+# ============================================
+
+spring:
+  application:
+    # 应用名称
+    name: spring-ai-demo
+
+  # 可选：配置Banner
+  main:
+    banner-mode: console
+
+  # ============================================
+  # Spring AI 核心配置
+  # ============================================
+  ai:
+
+    # ----------------------------------------
+    # OpenAI 模型配置
+    # ----------------------------------------
+    openai:
+      # API密钥 - 请替换为您的OpenAI API Key 或 兼容服务的API Key
+      # 可以通过环境变量 SPRING_AI_OPENAI_API_KEY 设置
+      api-key: ${OPENAI_API_KEY:openai-api-key}
+
+      # 基础URL（可选，用于代理或兼容服务如通义千问、DeepSeek等）
+      # base-url: https://api.openai.com
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+
+      # Chat模型配置
+      chat:
+        # 模型名称：gpt-4, gpt-3.5-turbo, qwen-turbo, deepseek-chat 等
+        options:
+          model: qwen3.5-plus
+          # 温度参数：0.0-2.0，控制随机性，越低越确定
+          temperature: 0.7
+          # 最大生成token数
+          max-tokens: 2000
+
+      # Embedding模型配置（用于向量嵌入）
+      embedding:
+        options:
+          model: text-embedding-ada-002
+
+    # ----------------------------------------
+    # Ollama 本地模型配置（可选）
+    # 用于本地部署的模型，如 llama2, mistral, qwen 等
+    # ----------------------------------------
+    ollama:
+      # Ollama服务地址
+      base-url: http://localhost:11434
+      chat:
+        options:
+          # 本地模型名称
+          model: qwen:7b
+          temperature: 0.7
+      embedding:
+        options:
+          model: nomic-embed-text
+
+    # ----------------------------------------
+    # 向量存储配置
+    # ----------------------------------------
+    # 当前使用内存向量存储(SimpleVectorStore)，无需配置
+    # 如需使用PGVector，请添加spring-ai-pgvector-store-spring-boot-starter依赖
+    # 并配置数据源：
+    # vectorstore:
+    #   pgvector:
+    #     dimensions: 1536
+    #     distance-type: COSINE_DISTANCE
+    #     initialize-schema: true
+
+# ============================================
+# 日志配置
+# ============================================
+logging:
+  level:
+    # Spring AI 调试日志
+    org.springframework.ai: DEBUG
+    # Spring Web日志
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ============================================
+# 自定义配置参数
+# ============================================
+app:
+  ai:
+    # 默认系统提示词
+    default-system-message: "你是一个 helpful AI 助手，请用中文回答问题，回答要简洁明了。"
+    # 记忆窗口大小（保留多少轮对话）
+    max-memory-messages: 10
+    # RAG检索返回的最大结果数
+    rag-max-results: 5
+    # RAG最小相似度分数
+    rag-min-score: 0.7
