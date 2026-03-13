@@ -1,6 +1,6 @@
 # LangChain4j Spring Boot 3 Demo
 
-基于 LangChain4j 0.35.0 和 Spring Boot 3.2.0 的 AI 应用开发最佳实践示例项目。
+基于 LangChain4j 0.36.2 和 Spring Boot 3.4.1 的 AI 应用开发最佳实践示例项目。
 
 ## 项目概述
 
@@ -11,18 +11,20 @@
 - **记忆功能**：ChatMemory 实现多轮对话上下文管理
 - **RAG 检索**：ContentRetriever 实现文档检索增强生成
 - **工具调用**：@Tool 注解实现 AI 调用自定义方法
+- **全局异常处理**：统一的错误响应格式
+- **配置属性类**：类型安全的配置管理
 
 ## 技术栈
 
 | 组件 | 版本 | 说明 |
 |------|------|------|
 | Java | 17+ | Spring Boot 3 最低要求 |
-| Spring Boot | 3.2.0 | 基础框架 |
-| LangChain4j | 0.35.0 | LLM 集成框架 |
-| LangChain4j Spring Boot Starter | 0.35.0 | 核心集成包 |
-| LangChain4j OpenAI Starter | 0.35.0 | OpenAI 模型支持 |
-| LangChain4j Embeddings | 0.35.0 | 本地 Embedding 模型 |
-| Lombok | 1.18.24 | 代码简化 |
+| Spring Boot | 3.4.1 | 基础框架 |
+| LangChain4j | 0.36.2 | LLM 集成框架 |
+| LangChain4j Spring Boot Starter | 0.36.2 | 核心集成包 |
+| LangChain4j OpenAI Starter | 0.36.2 | OpenAI 模型支持 |
+| LangChain4j Embeddings | 0.36.2 | 本地 Embedding 模型 |
+| Lombok | 1.18.34 | 代码简化 |
 
 ## 项目结构
 
@@ -32,6 +34,8 @@ langchain4j/
 │   ├── LangChain4jDemoApplication.java    # 应用启动类
 │   ├── config/
 │   │   ├── LangChain4jConfig.java         # 核心配置类
+│   │   ├── AiProperties.java              # AI配置属性类
+│   │   ├── GlobalExceptionHandler.java    # 全局异常处理
 │   │   └── RagDataInitializer.java        # RAG 数据初始化
 │   ├── controller/
 │   │   ├── AssistantController.java       # 基础 AI 接口
@@ -69,8 +73,8 @@ langchain4j:
   open-ai:
     chat-model:
       api-key: ${OPENAI_API_KEY:your-api-key-here}
-      model-name: qwen3.5-plus
-      base-url: https://coding.dashscope.aliyuncs.com/v1
+      model-name: qwen-plus
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
 ```
 
 或通过环境变量设置：
@@ -491,30 +495,59 @@ spring:
   application:
     name: langchain4j-demo
 
+server:
+  port: ${SERVER_PORT:8080}
+
 langchain4j:
   open-ai:
     chat-model:
       api-key: ${OPENAI_API_KEY:your-api-key}
-      model-name: qwen3.5-plus
-      temperature: 0.7
-      max-tokens: 2000
-      timeout: PT60S
-      base-url: https://coding.dashscope.aliyuncs.com/v1
+      model-name: ${OPENAI_MODEL_NAME:qwen-plus}
+      temperature: ${OPENAI_TEMPERATURE:0.7}
+      max-tokens: ${OPENAI_MAX_TOKENS:2000}
+      timeout-seconds: ${OPENAI_TIMEOUT_SECONDS:60}
+      base-url: ${OPENAI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
     
     embedding-model:
       api-key: ${OPENAI_API_KEY:your-api-key}
-      model-name: text-embedding-ada-002
-      timeout: PT60S
+      model-name: ${OPENAI_EMBEDDING_MODEL:text-embedding-v3}
+      timeout-seconds: ${OPENAI_TIMEOUT_SECONDS:60}
+
+# 自定义AI配置
+app:
+  ai:
+    default-system-message: "你是一个 helpful AI 助手"
+    max-memory-messages: 10
+    rag:
+      max-results: 3
+      min-score: 0.7
+    document-splitter:
+      max-size: 500
+      max-overlap: 50
+    retry:
+      enabled: true
+      max-attempts: 3
+      delay-ms: 1000
 
 logging:
   level:
+    net.coderlin.demo.langchain4j: INFO
     dev.langchain4j: DEBUG
-
-app:
-  ai:
-    default-system-message: "你是一个 helpful AI 助手，请用中文回答问题。"
-    max-memory-messages: 10
 ```
+
+### 环境变量说明
+
+| 环境变量 | 说明 | 默认值 |
+|---------|------|-------|
+| OPENAI_API_KEY | API 密钥 | - |
+| OPENAI_MODEL_NAME | 模型名称 | qwen-plus |
+| OPENAI_BASE_URL | API Base URL | 通义千问 |
+| OPENAI_TEMPERATURE | 温度参数 | 0.7 |
+| OPENAI_MAX_TOKENS | 最大Token数 | 2000 |
+| OPENAI_TIMEOUT_SECONDS | 超时时间(秒) | 60 |
+| AI_MAX_MEMORY_MESSAGES | 记忆窗口大小 | 10 |
+| AI_RAG_MAX_RESULTS | RAG最大结果数 | 3 |
+| AI_RAG_MIN_SCORE | RAG最小相似度 | 0.7 |
 
 ### 支持的模型提供商
 

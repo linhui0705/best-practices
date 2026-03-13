@@ -11,7 +11,7 @@
     <artifactId>langchain4j</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>langchain4j</name>
-    <description>LangChain4j最佳实践Demo - 基于Spring Boot 3</description>
+    <description>LangChain4j最佳实践Demo - 基于Spring Boot 3.4与LangChain4j 0.36</description>
 
     <properties>
         <!-- Java 17 是 Spring Boot 3 的最低要求 -->
@@ -19,9 +19,12 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- LangChain4j 版本 -->
-        <langchain4j.version>0.35.0</langchain4j.version>
-        <org.springframework.boot.version>3.2.0</org.springframework.boot.version>
+        <!-- LangChain4j 版本 - 稳定版 -->
+        <langchain4j.version>0.36.2</langchain4j.version>
+        <!-- Spring Boot 版本 - 3.4.x 最新稳定版 -->
+        <org.springframework.boot.version>3.4.1</org.springframework.boot.version>
+        <!-- Lombok 版本 -->
+        <lombok.version>1.18.34</lombok.version>
     </properties>
 
     <dependencies>
@@ -86,7 +89,21 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-            <version>1.18.30</version>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- Apache Commons Lang3 - 常用工具类 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+
+        <!-- Gson - LangChain4j需要较新版本的Gson，显式声明以解决版本冲突 -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
         </dependency>
     </dependencies>
 

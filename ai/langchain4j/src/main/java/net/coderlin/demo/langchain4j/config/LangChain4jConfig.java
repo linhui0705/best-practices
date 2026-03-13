@@ -14,6 +14,7 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coderlin.demo.langchain4j.service.Assistant;
 import net.coderlin.demo.langchain4j.service.MemoryAssistant;
@@ -29,6 +30,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
+import java.time.Duration;
+
 /**
  * LangChain4j 核心配置类
  *
@@ -38,6 +41,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  *   <li>EmbeddingStore：向量存储（用于RAG）</li>
  *   <li>EmbeddingModel：嵌入模型（用于生成向量）</li>
  *   <li>ContentRetriever：内容检索器（RAG核心组件）</li>
+ *   <li>AI Services：各类AI助手服务</li>
  * </ul>
  *
  * <p><b>设计说明：</b></p>
@@ -45,6 +49,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  *   <li>ChatMemory配置为请求作用域，每个用户会话独立维护对话历史</li>
  *   <li>EmbeddingStore使用内存存储，生产环境建议替换为向量数据库</li>
  *   <li>支持本地和远程两种Embedding模型</li>
+ *   <li>使用AiProperties统一管理配置参数</li>
  * </ul>
  *
  * @author
@@ -52,12 +57,13 @@ import org.springframework.context.annotation.ScopedProxyMode;
  */
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class LangChain4jConfig {
 
     /**
-     * 默认记忆窗口大小
+     * AI配置属性（通过构造器注入）
      */
-    private static final int DEFAULT_MAX_MEMORY_MESSAGES = 10;
+    private final AiProperties aiProperties;
 
     /**
      * 默认OpenAI Base URL
@@ -73,33 +79,6 @@ public class LangChain4jConfig {
      * 默认温度参数
      */
     private static final double DEFAULT_OPENAI_TEMPERATURE = 0.7;
-
-    /**
-     * 内容检索器最大返回结果数
-     */
-    private static final int CONTENT_RETRIEVER_MAX_RESULTS = 3;
-
-    /**
-     * 内容检索器最小相似度分数
-     */
-    private static final double CONTENT_RETRIEVER_MIN_SCORE = 0.7;
-
-    /**
-     * 文档分割器最大片段大小
-     */
-    private static final int DOCUMENT_SPLITTER_MAX_SIZE = 500;
-
-    /**
-     * 文档分割器最大重叠大小
-     */
-    private static final int DOCUMENT_SPLITTER_MAX_OVERLAP = 50;
-
-    /**
-     * 记忆窗口大小，从配置文件读取
-     * 控制保留多少轮对话历史
-     */
-    @Value("${app.ai.max-memory-messages:" + DEFAULT_MAX_MEMORY_MESSAGES + "}")
-    private int maxMemoryMessages;
 
     /**
      * OpenAI API Key
@@ -120,10 +99,10 @@ public class LangChain4jConfig {
     private String openAiBaseUrl;
 
     /**
-     * OpenAI 温度参数
+     * OpenAI 超时时间（秒）
      */
-    @Value("${langchain4j.open-ai.chat-model.temperature:" + DEFAULT_OPENAI_TEMPERATURE + "}")
-    private Double openAiTemperature;
+    @Value("${langchain4j.open-ai.chat-model.timeout-seconds:60}")
+    private int openAiTimeoutSeconds;
 
     /**
      * 配置ChatMemory Bean - 请求级别作用域
@@ -147,10 +126,11 @@ public class LangChain4jConfig {
     @Bean
     @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
     public ChatMemory chatMemory() {
-        log.debug("创建新的ChatMemory实例，窗口大小: {}", maxMemoryMessages);
+        int maxMessages = aiProperties.getMaxMemoryMessages();
+        log.debug("创建新的ChatMemory实例，窗口大小: {}", maxMessages);
         return MessageWindowChatMemory.builder()
                 // 设置最大消息数，控制上下文长度
-                .maxMessages(maxMemoryMessages)
+                .maxMessages(maxMessages)
                 .build();
     }
 
@@ -234,16 +214,18 @@ public class LangChain4jConfig {
     public ContentRetriever contentRetriever(
             EmbeddingStore<TextSegment> embeddingStore,
             EmbeddingModel embeddingModel) {
-        log.info("初始化EmbeddingStoreContentRetriever");
+        AiProperties.RagConfig ragConfig = aiProperties.getRag();
+        log.info("初始化EmbeddingStoreContentRetriever, maxResults={}, minScore={}", 
+                ragConfig.getMaxResults(), ragConfig.getMinScore());
         return EmbeddingStoreContentRetriever.builder()
                 // 向量存储
                 .embeddingStore(embeddingStore)
                 // 嵌入模型
                 .embeddingModel(embeddingModel)
                 // 返回最相关的结果
-                .maxResults(CONTENT_RETRIEVER_MAX_RESULTS)
+                .maxResults(ragConfig.getMaxResults())
                 // 最小相似度分数（0-1之间）
-                .minScore(CONTENT_RETRIEVER_MIN_SCORE)
+                .minScore(ragConfig.getMinScore())
                 .build();
     }
 
@@ -255,8 +237,8 @@ public class LangChain4jConfig {
      *   <li>递归分割策略，优先按段落、句子、单词分割</li>
      *   <li>参数说明：
      *     <ul>
-     *       <li>maxSegmentSize：每个片段最大字符数（如500）</li>
-     *       <li>maxOverlapSize：相邻片段重叠字符数（如50）</li>
+     *       <li>maxSegmentSize：每个片段最大字符数</li>
+     *       <li>maxOverlapSize：相邻片段重叠字符数</li>
      *     </ul>
      *   </li>
      *   <li>重叠设计确保上下文连续性</li>
@@ -266,7 +248,10 @@ public class LangChain4jConfig {
      */
     @Bean
     public DocumentSplitter documentSplitter() {
-        return DocumentSplitters.recursive(DOCUMENT_SPLITTER_MAX_SIZE, DOCUMENT_SPLITTER_MAX_OVERLAP);
+        AiProperties.DocumentSplitterConfig config = aiProperties.getDocumentSplitter();
+        log.info("初始化文档分割器, maxSize={}, maxOverlap={}", 
+                config.getMaxSize(), config.getMaxOverlap());
+        return DocumentSplitters.recursive(config.getMaxSize(), config.getMaxOverlap());
     }
 
     // ==================== ChatLanguageModel 配置 ====================
@@ -275,6 +260,7 @@ public class LangChain4jConfig {
      * 配置 OpenAI ChatLanguageModel
      * 
      * <p>手动创建 ChatLanguageModel Bean，用于 AI Services。</p>
+     * <p>支持通过环境变量配置API Key和其他参数。</p>
      * 
      * @return ChatLanguageModel OpenAI 聊天模型
      */
@@ -290,7 +276,8 @@ public class LangChain4jConfig {
         OpenAiChatModel.OpenAiChatModelBuilder builder = OpenAiChatModel.builder()
                 .apiKey(openAiApiKey)
                 .modelName(openAiModelName)
-                .temperature(openAiTemperature);
+                .temperature(DEFAULT_OPENAI_TEMPERATURE)
+                .timeout(Duration.ofSeconds(openAiTimeoutSeconds));
         
         if (openAiBaseUrl != null && StringUtils.isNotBlank(openAiBaseUrl)) {
             builder.baseUrl(openAiBaseUrl);
@@ -326,11 +313,12 @@ public class LangChain4jConfig {
      */
     @Bean
     public MemoryAssistant memoryAssistant(ChatLanguageModel chatLanguageModel) {
-        log.info("初始化带记忆AI助手 (MemoryAssistant)");
+        int maxMessages = aiProperties.getMaxMemoryMessages();
+        log.info("初始化带记忆AI助手 (MemoryAssistant), maxMessages={}", maxMessages);
         return AiServices.builder(MemoryAssistant.class)
                 .chatLanguageModel(chatLanguageModel)
                 .chatMemoryProvider(memoryId -> MessageWindowChatMemory.builder()
-                        .maxMessages(maxMemoryMessages)
+                        .maxMessages(maxMessages)
                         .build())
                 .build();
     }
@@ -347,12 +335,13 @@ public class LangChain4jConfig {
     @Bean
     public RagAssistant ragAssistant(ChatLanguageModel chatLanguageModel, 
                                       ContentRetriever contentRetriever) {
+        int maxMessages = aiProperties.getMaxMemoryMessages();
         log.info("初始化RAG AI助手 (RagAssistant)");
         return AiServices.builder(RagAssistant.class)
                 .chatLanguageModel(chatLanguageModel)
                 .contentRetriever(contentRetriever)
                 .chatMemoryProvider(memoryId -> MessageWindowChatMemory.builder()
-                        .maxMessages(maxMemoryMessages)
+                        .maxMessages(maxMessages)
                         .build())
                 .build();
     }
@@ -371,12 +360,13 @@ public class LangChain4jConfig {
     public ToolsAssistant toolsAssistant(ChatLanguageModel chatLanguageModel,
                                           CalculatorTools calculatorTools,
                                           WeatherTools weatherTools) {
+        int maxMessages = aiProperties.getMaxMemoryMessages();
         log.info("初始化工具调用AI助手 (ToolsAssistant)");
         return AiServices.builder(ToolsAssistant.class)
                 .chatLanguageModel(chatLanguageModel)
                 .tools(calculatorTools, weatherTools)
                 .chatMemoryProvider(memoryId -> MessageWindowChatMemory.builder()
-                        .maxMessages(maxMemoryMessages)
+                        .maxMessages(maxMessages)
                         .build())
                 .build();
     }
